@@ -6,23 +6,30 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:../dev.db"
 }
 
-enum Role {
-  ADMIN
-  USER
+model Dokumen {
+  id               String         @id @default(uuid())
+  nama             String
+  jenisPeraturan   JenisPeraturan @relation(fields: [jenisPeraturanId], references: [id])
+  jenisPeraturanId Int
+  kategori         Kategori       @relation(fields: [kategoriId], references: [id])
+  kategoriId       Int
+  link             String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  password  String
-  image     String?
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model JenisPeraturan {
+  id                 Int       @id @default(autoincrement())
+  namaJenisPeraturan String
+  dokumen            Dokumen[]
+}
+
+model Kategori {
+  id           Int       @id @default(autoincrement())
+  namaKategori String
+  dokumen      Dokumen[]
 }
